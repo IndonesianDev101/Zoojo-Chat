@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zoojo Chat</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div id="screen-register" class="full-screen">
+        <div class="glass-card">
+            <div class="zj-logo-main">ZJ</div>
+            <h1>Selamat Datang di Zoojo Chat</h1>
+            <p class="dev-text">Dikembangkan oleh Faizan Izan</p>
+            
+            <div id="id-display-area" class="hidden">
+                <p>ID Zoojo Kamu:</p>
+                <h2 id="generated-id" class="cyan-text">ZJ...</h2>
+            </div>
+
+            <div id="action-btns">
+                <button id="btn-create" class="btn-primary" onclick="startLoading()">Buat ID Zoojo Kamu</button>
+            </div>
+            
+            <div id="post-id-btns" class="hidden">
+                <div class="btn-group">
+                    <button class="btn-outline" onclick="startLoading()">Buat Ulang ID</button>
+                    <button class="btn-primary" onclick="keDashboard()">Lanjut</button>
+                </div>
+            </div>
+
+            <div id="loader" class="hidden">
+                <div class="spinner"></div>
+                <p>Sedang memproses</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-dashboard" class="app-container hidden">
+        <aside class="sidebar">
+            <header class="side-header">
+                <div class="mini-logo">ZJ</div>
+                <div class="side-icons">
+                    <i class="fas fa-plus-circle" onclick="bukaModalTambah()" title="Tambah Teman"></i>
+                    <i class="fas fa-ellipsis-v" onclick="bukaHalamanID()" title="Menu"></i>
+                </div>
+            </header>
+            <div id="contact-list" class="contact-list">
+                <p class="empty-info">Belum ada teman ditambahkan.</p>
+            </div>
+        </aside>
+
+        <main class="chat-main">
+            <div id="no-chat" class="welcome-chat">
+                <i class="fas fa-comments"></i>
+                <h2>Zoojo Chat</h2>
+                <p>Pilih teman di sebelah kiri untuk mulai chatan.</p>
+            </div>
+
+            <div id="chat-window" class="chat-window hidden">
+                <header class="chat-header">
+                    <div class="avatar-circle">ZJ</div>
+                    <span id="chat-with-id">ID Teman</span>
+                </header>
+                <div id="messages" class="message-container"></div>
+                <div class="chat-input-bar">
+                    <input type="text" id="msg-input" placeholder="Ketik pesan biru mu...">
+                    <button onclick="kirimPesan()"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="screen-profile" class="full-screen hidden">
+        <div class="glass-card">
+            <div class="zj-logo-main">ZJ</div>
+            <h1>Profil Zoojo Kamu</h1>
+            <p class="dev-text">Identitas Digital Zoojo Chat</p>
+            
+            <div class="id-info-box">
+                <p style="font-size: 12px; letter-spacing: 2px; color: #00f2ff; margin-bottom: 10px;">NOMOR ZOOJO SAYA:</p>
+                <h2 id="my-id-display" class="cyan-text" style="font-size: 32px;">ZJ...</h2>
+            </div>
+
+            <button class="btn-primary" onclick="kembaliKeChat()">
+                <i class="fas fa-arrow-left"></i> KEMBALI
+            </button>
+        </div>
+    </div>
+
+    <div id="modal-tambah" class="modal hidden">
+        <div class="modal-content">
+            <h3>Tambah Teman Zoojo</h3>
+            <input type="text" id="input-target" placeholder="Masukkan ID ZJ Teman...">
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="tutupModal()">Batal</button>
+                <button class="btn-primary" onclick="tambahTeman()">Tambah</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
