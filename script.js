@@ -2,13 +2,15 @@ const socket = io();
 let myID = localStorage.getItem("zoojo_id") || "";
 let contacts = JSON.parse(localStorage.getItem("zoojo_contacts") || "[]");
 
-// --- 1. FUNGSI GENERATE ID (INSTAN) ---
-function startLoading() {
-    // Langsung buat ID tanpa nunggu setTimeout
+// --- 1. FUNGSI BUAT ID (PASTIKAN NAMANYA SAMA DENGAN ONCLICK DI HTML) ---
+function buatIDInstan() {
+    console.log("Tombol diklik, membuat ID...");
+    
+    // Generate ID unik
     myID = "ZJ" + Math.floor(10000000 + Math.random() * 90000000);
     localStorage.setItem("zoojo_id", myID);
     
-    // Langsung update tampilan
+    // Update Tampilan (Hilangkan tombol lama, munculkan ID)
     document.getElementById('btn-create').classList.add('hidden');
     document.getElementById('id-display-area').classList.remove('hidden');
     document.getElementById('generated-id').innerText = myID;
@@ -16,10 +18,9 @@ function startLoading() {
     
     // Daftarkan ke server
     socket.emit('register', myID);
-    console.log("ID Berhasil Dibuat: " + myID);
 }
 
-// --- 2. NAVIGASI HALAMAN ---
+// --- 2. NAVIGASI ---
 function keDashboard() {
     if (!myID) return alert("Buat ID dulu bos!");
     document.getElementById('screen-register').classList.add('hidden');
@@ -38,7 +39,7 @@ function kembaliKeChat() {
     document.getElementById('screen-dashboard').classList.remove('hidden');
 }
 
-// --- 3. KONTAK & MODAL ---
+// --- 3. SISTEM KONTAK & CHAT ---
 function bukaModalTambah() {
     document.getElementById('modal-tambah').classList.remove('hidden');
 }
@@ -80,7 +81,6 @@ function bukaRoomChat(id) {
     document.getElementById('chat-with-id').innerText = id;
 }
 
-// --- 4. SISTEM CHAT ---
 function kirimPesan() {
     const input = document.getElementById('msg-input');
     const targetID = document.getElementById('chat-with-id').innerText;
@@ -110,7 +110,7 @@ function tampilkanPesan(teks, tipe) {
     container.scrollTop = container.scrollHeight;
 }
 
-// Auto-login
+// Auto-login saat refresh
 window.onload = () => {
     if (myID) {
         document.getElementById('id-display-area').classList.remove('hidden');
