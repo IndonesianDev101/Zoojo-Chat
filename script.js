@@ -2,27 +2,23 @@ const socket = io();
 let myID = localStorage.getItem("zoojo_id") || "";
 let contacts = JSON.parse(localStorage.getItem("zoojo_contacts") || "[]");
 
-// --- 1. FUNGSI BUAT ID (PASTIKAN NAMANYA SAMA DENGAN ONCLICK DI HTML) ---
-function buatIDInstan() {
-    console.log("Tombol diklik, membuat ID...");
-    
-    // Generate ID unik
+// 1. FUNGSI UTAMA TOMBOL
+function aksiBuatID() {
+    console.log("Tombol Berhasil Dipencet!");
     myID = "ZJ" + Math.floor(10000000 + Math.random() * 90000000);
     localStorage.setItem("zoojo_id", myID);
     
-    // Update Tampilan (Hilangkan tombol lama, munculkan ID)
     document.getElementById('btn-create').classList.add('hidden');
     document.getElementById('id-display-area').classList.remove('hidden');
     document.getElementById('generated-id').innerText = myID;
     document.getElementById('post-id-btns').classList.remove('hidden');
     
-    // Daftarkan ke server
     socket.emit('register', myID);
 }
 
-// --- 2. NAVIGASI ---
+// 2. NAVIGASI
 function keDashboard() {
-    if (!myID) return alert("Buat ID dulu bos!");
+    if (!myID) return alert("Buat ID dulu!");
     document.getElementById('screen-register').classList.add('hidden');
     document.getElementById('screen-dashboard').classList.remove('hidden');
     renderContacts();
@@ -31,7 +27,7 @@ function keDashboard() {
 function bukaHalamanID() {
     document.getElementById('screen-dashboard').classList.add('hidden');
     document.getElementById('screen-profile').classList.remove('hidden');
-    document.getElementById('my-id-display').innerText = localStorage.getItem("zoojo_id") || myID;
+    document.getElementById('my-id-display').innerText = myID;
 }
 
 function kembaliKeChat() {
@@ -39,54 +35,43 @@ function kembaliKeChat() {
     document.getElementById('screen-dashboard').classList.remove('hidden');
 }
 
-// --- 3. SISTEM KONTAK & CHAT ---
-function bukaModalTambah() {
-    document.getElementById('modal-tambah').classList.remove('hidden');
-}
-
-function tutupModal() {
-    document.getElementById('modal-tambah').classList.add('hidden');
-}
+// 3. CHAT & KONTAK
+function bukaModalTambah() { document.getElementById('modal-tambah').classList.remove('hidden'); }
+function tutupModal() { document.getElementById('modal-tambah').classList.add('hidden'); }
 
 function tambahTeman() {
     const target = document.getElementById('input-target').value.trim();
-    if (target.startsWith("ZJ") && target !== myID) {
+    if (target && target !== myID) {
         if (!contacts.includes(target)) {
             contacts.push(target);
             localStorage.setItem("zoojo_contacts", JSON.stringify(contacts));
         }
         renderContacts();
         tutupModal();
-        document.getElementById('input-target').value = "";
-    } else {
-        alert("ID tidak valid!");
     }
 }
 
 function renderContacts() {
     const list = document.getElementById('contact-list');
-    list.innerHTML = contacts.length === 0 ? '<p class="empty-info">Belum ada teman.</p>' : "";
+    list.innerHTML = "";
     contacts.forEach(id => {
         const div = document.createElement('div');
         div.className = 'contact-item';
         div.innerHTML = `<div class="avatar-circle">ZJ</div><span>${id}</span>`;
-        div.onclick = () => bukaRoomChat(id);
+        div.onclick = () => {
+            document.getElementById('no-chat').classList.add('hidden');
+            document.getElementById('chat-window').classList.remove('hidden');
+            document.getElementById('chat-with-id').innerText = id;
+        };
         list.appendChild(div);
     });
-}
-
-function bukaRoomChat(id) {
-    document.getElementById('no-chat').classList.add('hidden');
-    document.getElementById('chat-window').classList.remove('hidden');
-    document.getElementById('chat-with-id').innerText = id;
 }
 
 function kirimPesan() {
     const input = document.getElementById('msg-input');
     const targetID = document.getElementById('chat-with-id').innerText;
-    const pesan = input.value.trim();
-
-    if (pesan && targetID) {
+    if (input.value.trim() && targetID) {
+        const pesan = input.value;
         socket.emit('kirim-pesan', { sender: myID, target: targetID, text: pesan });
         tampilkanPesan(pesan, 'sent');
         input.value = "";
@@ -97,7 +82,7 @@ socket.on('terima-pesan', (data) => {
     if (data.sender === document.getElementById('chat-with-id').innerText) {
         tampilkanPesan(data.text, 'received');
     } else {
-        alert("Pesan baru dari " + data.sender);
+        alert("Pesan masuk dari " + data.sender);
     }
 });
 
@@ -110,13 +95,13 @@ function tampilkanPesan(teks, tipe) {
     container.scrollTop = container.scrollHeight;
 }
 
-// Auto-login saat refresh
+// AUTO LOGIN
 window.onload = () => {
     if (myID) {
+        document.getElementById('btn-create').classList.add('hidden');
         document.getElementById('id-display-area').classList.remove('hidden');
         document.getElementById('generated-id').innerText = myID;
         document.getElementById('post-id-btns').classList.remove('hidden');
-        document.getElementById('btn-create').classList.add('hidden');
         socket.emit('register', myID);
     }
 };
